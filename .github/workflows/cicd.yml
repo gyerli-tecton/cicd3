@@ -1,0 +1,40 @@
+name: CI / CD
+
+on:
+  push:
+    branches: [prod]
+  pull_request:
+    branches: [prod]
+  workflow_dispatch:
+
+jobs:
+    plan:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v3
+
+        - name: running Tecton plan
+          run: echo Running tecton plan
+    
+    apply-dev:
+        name: Apply to devevelopment
+        if: github.event_name == 'pull_request'
+        needs: [plan]
+        runs-on: ubuntu-latest
+        environment: 
+            name: dev
+        steps:
+          - name: Apply
+            run: echo I am applying to dev!
+
+    apply-stage:
+        name: Apply to stage
+        if: github.event.ref == 'refs/heads/stage'
+        needs: [plan]
+        runs-on: ubuntu-latest
+        environment: 
+            name: stage
+        steps:
+            - name: Apply stage
+              run: echo I am applying to stage!
+
